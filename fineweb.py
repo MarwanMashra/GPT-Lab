@@ -55,7 +55,19 @@ def main():
         all_tokens_np = np.empty((SHARD_SIZE,), dtype=np.uint16)
         token_count = 0
         progress_bar = None
+        tokens_to_skip = SHARD_SIZE * len(os.listdir(DATA_CACHE_DIR))
+        skip_progress_bar = tqdm(
+            total=tokens_to_skip, unit="tokens", desc="Skipping already processed tokens"
+        )
         for tokens in pool.imap(tokenize, fw, chunksize=16):
+
+            tokens_to_forward = min(tokens_to_skip, len(tokens))
+            tokens = tokens[tokens_to_forward:]
+            tokens_to_skip -= tokens_to_forward
+            skip_progress_bar.update(tokens_to_forward)
+
+            if len(tokens) == 0:
+                continue
 
             # is there enough space in the current shard for the new tokens?
             if token_count + len(tokens) < SHARD_SIZE:
@@ -74,7 +86,8 @@ def main():
                 remainder = SHARD_SIZE - token_count
                 progress_bar.update(remainder)
                 all_tokens_np[token_count : token_count + remainder] = tokens[:remainder]
-                write_datafile(filename, all_tokens_np)
+                if not os.path.exists(filename):
+                    write_datafile(filename, all_tokens_np)
                 shard_index += 1
                 progress_bar = None
                 # populate the next shard with the leftovers of the current doc
