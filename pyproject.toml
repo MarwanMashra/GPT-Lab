@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "gpt-lab"
+version = "0.1.0"
+description = "A clean(ish), handcrafted GPT implementation—imperfect, probably suboptimal, and stitched together with hope and late-night hacking 🌟"
+authors = ["MarwanMashra <marwan.mashra@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "^2.2.4"
+tiktoken = "^0.9.0"
+datasets = "^3.4.1"
+tqdm = "^4.67.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
